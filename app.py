@@ -3,7 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/db.sqlite'
+# Use absolute path for database
+db_path = os.path.join(os.path.dirname(__file__), 'db', 'db.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path.replace(chr(92), "/")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -78,8 +80,8 @@ def update(todo_id):
 
 
 if __name__ == "__main__":
-    
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     port = int(os.environ.get('PORT', 5000))
 
     app.run(host = '0.0.0.0', port = port)
